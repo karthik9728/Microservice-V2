@@ -1,7 +1,29 @@
+using Mango.Web;
+using Mango.Web.Services;
+using Mango.Web.Services.IServices;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//HttpClient Service
+builder.Services.AddHttpClient<IProductService,ProductService>();
+
+
+#region SD Url
+
+var connectionStringProductAPI = builder.Configuration["ServiceUrl:ProductAPI"];
+//SD.ProductAPIBase = builder.Configuration["ServiceUrl:ProductAPI"];
+SD.ProductAPIBase = connectionStringProductAPI;
+
+#endregion
+
+#region DI Service
+
+builder.Services.AddScoped<IProductService, ProductService>();
+
+#endregion
 
 var app = builder.Build();
 
