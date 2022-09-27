@@ -1,5 +1,6 @@
 using Mango.Services.Identity;
 using Mango.Services.Identity.DbContexts;
+using Mango.Services.Identity.Initializer;
 using Mango.Services.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,24 @@ identityBuilder.AddDeveloperSigningCredential();
 
 #endregion
 
+
+#region
+
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+//builder.Services.AddScoped<IProfileService, ProfileService>();
+
+#endregion
+
 var app = builder.Build();
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -56,6 +74,8 @@ app.UseRouting();
 app.UseIdentityServer();
 
 app.UseAuthorization();
+
+SeedDatabase();
 
 app.MapControllerRoute(
     name: "default",
