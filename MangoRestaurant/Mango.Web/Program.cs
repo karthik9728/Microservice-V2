@@ -13,7 +13,7 @@ builder.Services.AddHttpClient<IProductService,ProductService>();
 
 #region SD Url
 
-var connectionStringProductAPI = builder.Configuration["ServiceUrl:ProductAPI"];
+var connectionStringProductAPI = builder.Configuration["ServiceUrls:ProductAPI"];
 //SD.ProductAPIBase = builder.Configuration["ServiceUrl:ProductAPI"];
 SD.ProductAPIBase = connectionStringProductAPI;
 
