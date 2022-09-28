@@ -1,6 +1,7 @@
 using Mango.Web;
 using Mango.Web.Services;
 using Mango.Web.Services.IServices;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //HttpClient Service
-builder.Services.AddHttpClient<IProductService,ProductService>();
+builder.Services.AddHttpClient<IProductService, ProductService>();
 
 
 #region SD Url
 
 var connectionStringProductAPI = builder.Configuration["ServiceUrls:ProductAPI"];
+var connectionStringIdenitytAPI = builder.Configuration["ServiceUrls:IdentityAPI"];
 //SD.ProductAPIBase = builder.Configuration["ServiceUrl:ProductAPI"];
 SD.ProductAPIBase = connectionStringProductAPI;
 
@@ -24,6 +26,32 @@ SD.ProductAPIBase = connectionStringProductAPI;
 builder.Services.AddScoped<IProductService, ProductService>();
 
 #endregion
+
+#region 
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = "oidc";
+
+}).AddCookie("Cookies", x => x.ExpireTimeSpan = TimeSpan.FromMinutes(10))
+  .AddOpenIdConnect("oidc", options =>
+  {
+      options.Authority = connectionStringIdenitytAPI;
+      options.GetClaimsFromUserInfoEndpoint = true;
+      options.ClientId = "mango";
+      options.ClientSecret = "secret";
+      options.ResponseType = "code";
+      options.ClaimActions.MapJsonKey("role", "role", "role");
+      options.ClaimActions.MapJsonKey("sub", "sub", "sub");
+      options.TokenValidationParameters.NameClaimType = "name";
+      options.TokenValidationParameters.RoleClaimType = "role";
+      options.Scope.Add("mango");
+      options.SaveTokens = true;
+  });
+
+#endregion
+
 
 var app = builder.Build();
 
@@ -39,6 +67,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
