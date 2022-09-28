@@ -17,7 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
 {
     //Where the token is coming from? 
-    options.Authority = "https://localhost:7289/";
+    options.Authority = "https://localhost:44395";
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateAudience = false,
@@ -60,6 +60,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddEndpointsApiExplorer();
 
 #region Swagger Configuration
+
+//builder.Services.AddSwaggerGen();
 
 builder.Services.AddSwaggerGen(x =>
 {
@@ -104,6 +106,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
