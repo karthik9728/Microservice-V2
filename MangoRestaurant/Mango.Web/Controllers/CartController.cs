@@ -11,12 +11,14 @@ namespace Mango.Web.Controllers
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
         private readonly ICouponService _couponService;
+        private readonly IOrderService _orderService;
 
-        public CartController(ICartService cartService, IProductService productService,ICouponService couponService)
+        public CartController(ICartService cartService, IProductService productService,ICouponService couponService, IOrderService orderService)
         {
             _cartService = cartService;
             _productService = productService;
             _couponService = couponService;
+            _orderService = orderService;
         }
 
         public async Task<IActionResult> CartIndex()
@@ -37,7 +39,8 @@ namespace Mango.Web.Controllers
             try
             {
                 var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var responce = await _cartService.Checkout<ResponceDto>(cartDto.CartHeader,accessToken);
+                //var responce = await _cartService.Checkout<ResponceDto>(cartDto.CartHeader,accessToken);
+                var responce = await _orderService.CreateOrderAsync<ResponceDto>(cartDto.CartHeader,accessToken);
                 return RedirectToAction(nameof(Confirmation));
             }
             catch (Exception ex)

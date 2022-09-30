@@ -12,6 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<IProductService, ProductService>();
 builder.Services.AddHttpClient<ICartService, CartService>();
 builder.Services.AddHttpClient<ICouponService, CouponService>();
+builder.Services.AddHttpClient<IOrderService, OrderService>();
 
 
 #region SD Url
@@ -20,10 +21,12 @@ var connectionStringProductAPI = builder.Configuration["ServiceUrls:ProductAPI"]
 var connectionStringIdenitytAPI = builder.Configuration["ServiceUrls:IdentityAPI"];
 var connectionStringShoppingCartAPI = builder.Configuration["ServiceUrls:ShoppingCartAPI"];
 var connectionStringCoupontAPI = builder.Configuration["ServiceUrls:CouponCartAPI"];
+var connectionStringOrderAPI = builder.Configuration["ServiceUrls:OrderAPI"];
 //SD.ProductAPIBase = builder.Configuration["ServiceUrl:ProductAPI"];
 SD.ProductAPIBase = connectionStringProductAPI;
 SD.ShoppingCartAPIBase = connectionStringShoppingCartAPI;
 SD.CouponAPIBase = connectionStringCoupontAPI;
+SD.OrderAPIBase = connectionStringOrderAPI;
 
 #endregion
 
@@ -32,6 +35,7 @@ SD.CouponAPIBase = connectionStringCoupontAPI;
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 #endregion
 
