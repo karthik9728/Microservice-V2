@@ -10,17 +10,20 @@ namespace Mango.Web.Controllers
     {
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
+        private readonly ICouponService _couponService;
 
-        public CartController(ICartService cartService, IProductService productService)
+        public CartController(ICartService cartService, IProductService productService,ICouponService couponService)
         {
             _cartService = cartService;
             _productService = productService;
+            _couponService = couponService;
         }
 
         public async Task<IActionResult> CartIndex()
         {
             return View(await LoadCartDtoBasedOnLoggedInUser());
         }
+
 
         private async Task<CartDto> LoadCartDtoBasedOnLoggedInUser()
         {
@@ -37,10 +40,23 @@ namespace Mango.Web.Controllers
 
             if(cartDto.CartHeader != null)
             {
+                if (!string.IsNullOrEmpty(cartDto.CartHeader.CouponCode))
+                {
+                    var coupon = await _couponService.GetCoupon<ResponceDto>(cartDto.CartHeader.CouponCode,accessToken);
+                    if (coupon != null && coupon.IsSuccess)
+                    {
+                        var couponObj = JsonConvert.DeserializeObject<CouponDto>(Convert.ToString(coupon.Result));
+                        cartDto.CartHeader.DiscountTotal = couponObj.DiscountAmount;
+
+                    }
+                }
+
                 foreach (var detail in cartDto.CartDetails)
                 {
                     cartDto.CartHeader.OrderTotal += (detail.Product.Price * detail.Count);
                 }
+
+                cartDto.CartHeader.OrderTotal -= cartDto.CartHeader.DiscountTotal; 
             }
 
             return cartDto;
@@ -52,6 +68,37 @@ namespace Mango.Web.Controllers
             var accessToken = await HttpContext.GetTokenAsync("access_token");
             var responce = await _cartService.RemoveFromCartAsync<ResponceDto>(cartDetailsId, accessToken);
 
+
+            if (responce != null && responce.IsSuccess)
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("ApplyCoupon")]
+        public async Task<IActionResult> ApplyCoupon(CartDto cartDto)
+        {
+            var userId = User.Claims.Where(x => x.Type == "sub")?.FirstOrDefault()?.Value;
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            var responce = await _cartService.ApplyCoupon<ResponceDto>(cartDto, accessToken);
+
+            if (responce != null && responce.IsSuccess)
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+            return View();
+        }
+
+
+        [HttpPost]
+        [ActionName("RemoveCoupon")]
+        public async Task<IActionResult> RemoveCoupon(CartDto cartDto)
+        {
+            var userId = User.Claims.Where(x => x.Type == "sub")?.FirstOrDefault()?.Value;
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            var responce = await _cartService.RemoveCoupon<ResponceDto>(cartDto.CartHeader.UserId, accessToken);
 
             if (responce != null && responce.IsSuccess)
             {
