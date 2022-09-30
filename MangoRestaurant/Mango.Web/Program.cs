@@ -10,20 +10,24 @@ builder.Services.AddControllersWithViews();
 
 //HttpClient Service
 builder.Services.AddHttpClient<IProductService, ProductService>();
+builder.Services.AddHttpClient<ICartService, CartService>();
 
 
 #region SD Url
 
 var connectionStringProductAPI = builder.Configuration["ServiceUrls:ProductAPI"];
 var connectionStringIdenitytAPI = builder.Configuration["ServiceUrls:IdentityAPI"];
+var connectionStringShoppingCartAPI = builder.Configuration["ServiceUrls:ShoppingCartAPI"];
 //SD.ProductAPIBase = builder.Configuration["ServiceUrl:ProductAPI"];
 SD.ProductAPIBase = connectionStringProductAPI;
+SD.ShoppingCartAPIBase = connectionStringShoppingCartAPI;
 
 #endregion
 
 #region DI Service
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 #endregion
 
