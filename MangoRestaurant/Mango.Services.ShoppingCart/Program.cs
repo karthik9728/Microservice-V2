@@ -1,6 +1,5 @@
-using Mango.Services.ProductAPI.DbContexts;
-using Mango.Services.ProductAPI.Mapping;
-using Mango.Services.ProductAPI.Repository;
+using Mango.Services.ShoppingCart.DbContexts;
+using Mango.Services.ShoppingCart.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -53,7 +52,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 #region Repository Configuration
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+//builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 #endregion
 
@@ -65,7 +64,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(x =>
 {
-    x.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.ProductAPI", Version = "V1" });
+    x.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.ShoppingCartAPI", Version = "V1" });
     x.EnableAnnotations();
     x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
